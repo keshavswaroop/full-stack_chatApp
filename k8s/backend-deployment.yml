@@ -1,0 +1,37 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: backend-deployment
+  namespace: chat-app
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  # Creating pod
+  template:
+    metadata:
+      name: backend-pod
+      namespace: chat-app
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: chatapp-backend
+          image: swaroop0532/chatapp-backend:latest
+          ports:
+            - containerPort: 5001
+          env: #Taken from docker file as it has this variable
+            - name: NODE_ENV
+              value: production
+            - name: MONGODB_URI
+              value: "mongodb://mongoadmin:secret@mongodb:27017/dbname?authSource=admin"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: chatapp-secrets
+                  key: jwt
+            - name: PORT
+              value: "5001"
